@@ -1,0 +1,42 @@
+
+input_folder = "/content/drive/MyDrive/AI/StableDiffusion/2023-01/trippy"#@param {type: "string"}
+desired_fps = ""#@param {type: "string"}
+
+
+import cv2
+import os
+
+# Get the name of the input folder without the path.
+input_folder_name = os.path.basename(input_folder)
+
+# Create the output video path based on the input folder name and desired FPS.
+output_video_path = f"{input_folder}/{input_folder_name}_{desired_fps}fps.mp4"
+
+# Retrieve image files with either '.jpg' or '.png' extension and sort them by filename.
+image_files = [os.path.join(input_folder, file) for file in os.listdir(input_folder) if file.endswith(('.jpg', '.png'))]
+image_files.sort()  # Sort the image files by filename.
+
+# Initialize a list to store the image frames.
+frames = []
+
+# Assuming all images have the same dimensions, get width and height from the first image.
+first_img = cv2.imread(image_files[0])
+height, width, layers = first_img.shape
+
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Change 'mp4v' to the desired codec.
+
+# Convert desired_fps to an integer
+desired_fps = int(desired_fps)
+
+video_writer = cv2.VideoWriter(output_video_path, fourcc, desired_fps, (width, height))
+
+# Loop through the sorted image files, read each image, and add it to the frames list.
+for image_file in image_files:
+    img = cv2.imread(image_file)
+    frames.append(img)
+
+# Write the frames to the video.
+for frame in frames:
+    video_writer.write(frame)
+
+video_writer.release()
